@@ -47,6 +47,10 @@ eos
 #
 # http://guides.rubyonrails.org/association_basics.html
 class Link < ActiveRecord::Base
+    def after_initialize params
+        @url = params.fetch('url')
+        @shortened = params.fetch('shortened')
+    end
 end
 
 get '/' do
@@ -54,8 +58,17 @@ get '/' do
 end
 
 post '/new' do
-    # PUT CODE HERE TO CREATE NEW SHORTENED LINKS
-    @params.fetch 'url'
+
+    $link = Link.find_by( url: @params.fetch('url') )
+    if $link.nil?
+        @params['shortened'] = @params.fetch('url').hash.to_s(36)
+        $link = Link.new @params
+        $link.save
+        $link
+    else
+        $link
+    end
+    # binding.pry
 end
 
 get '/jquery.js' do
