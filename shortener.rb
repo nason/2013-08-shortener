@@ -55,6 +55,7 @@ end
 
 post '/new' do
     # PUT CODE HERE TO CREATE NEW SHORTENED LINKS
+    @params.fetch 'url'
 end
 
 get '/jquery.js' do
