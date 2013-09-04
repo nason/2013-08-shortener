@@ -52,10 +52,6 @@ class Link < ActiveRecord::Base
         @shortened = params[:shortened]
     end
 
-    def shortened
-        @shortened
-    end
-
     def display
         "Shortened link to #{self[:url]}:\t\t<a href='http://localhost:4567/l/#{self[:shortened]}'>#{self[:shortened]}</a>"
     end
@@ -82,7 +78,7 @@ post '/new' do
         $link = Link.new @params
         $link.save
     end
-    [201, $link.display]
+    $link.display
 end
 
 get '/jquery.js' do
