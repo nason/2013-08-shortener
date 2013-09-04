@@ -48,26 +48,37 @@ eos
 # http://guides.rubyonrails.org/association_basics.html
 class Link < ActiveRecord::Base
     def after_initialize params
-        @url = params.fetch('url')
+        @url = @params[:url]
         @shortened = params.fetch('shortened')
     end
+
+    def shortened
+        @shortened
+    end
+
 end
 
 get '/' do
     form
 end
 
-post '/new' do
-
-    $link = Link.find_by( url: @params.fetch('url') )
+get '/l/:shortened' do
+    $link = Link.find_by( shortened: @params[:shortened] )
     if $link.nil?
-        @params['shortened'] = @params.fetch('url').hash.to_s(36)
+        status 404
+    else
+        redirect to( 'http://' + $link.url ), 303
+    end
+end
+
+post '/new' do
+    $link = Link.find_by( url: @params[:url] )
+    if $link.nil?
+        @params['shortened'] = @params[:url].hash.to_s(36)
         $link = Link.new @params
         $link.save
-        $link
-    else
-        $link
     end
+    $link.shortened
     # binding.pry
 end
 
