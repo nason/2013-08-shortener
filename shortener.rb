@@ -33,6 +33,7 @@ form = <<-eos
         $(function() {
             $('#myForm').submit(function() {
             $.post('/new', $("#myForm").serialize(), function(data){
+                debugger;
                 $('#display').html(data);
                 });
             return false;
@@ -49,11 +50,15 @@ eos
 class Link < ActiveRecord::Base
     def after_initialize params
         @url = @params[:url]
-        @shortened = params.fetch('shortened')
+        @shortened = params[:shortened]
     end
 
     def shortened
         @shortened
+    end
+
+    def display
+        "Shortened link to #{self[:url]}:\t\t<a href='http://localhost:4567/l/#{self[:shortened]}'>#{self[:shortened]}</a>"
     end
 
 end
@@ -67,19 +72,18 @@ get '/l/:shortened' do
     if $link.nil?
         status 404
     else
-        redirect to( 'http://' + $link.url ), 303
+        redirect('http://' + $link.url )
     end
 end
 
 post '/new' do
     $link = Link.find_by( url: @params[:url] )
     if $link.nil?
-        @params['shortened'] = @params[:url].hash.to_s(36)
+        @params[:shortened] = @params[:url].hash.to_s(36)
         $link = Link.new @params
         $link.save
     end
-    $link.shortened
-    # binding.pry
+    [201, $link.display]
 end
 
 get '/jquery.js' do
