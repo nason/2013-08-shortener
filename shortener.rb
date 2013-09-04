@@ -33,7 +33,6 @@ form = <<-eos
         $(function() {
             $('#myForm').submit(function() {
             $.post('/new', $("#myForm").serialize(), function(data){
-                debugger;
                 $('#display').html(data);
                 });
             return false;
